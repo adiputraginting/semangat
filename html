@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10233f">
+<title>LCC Arena - Lomba Cerdas Cermat</title>
+<style>
+:root{--navy:#10233f;--blue:#1d4ed8;--cyan:#38bdf8;--gold:#fbbf24;--green:#16a34a;--red:#dc2626;--bg:#f3f6fb;--ink:#172033;--muted:#64748b;--line:#dbe3ef}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(120deg,#10233f,#1e40af);color:white;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-size:1.3rem;font-weight:900;letter-spacing:.4px}.brand span{color:var(--gold)}.sub{font-size:.82rem;color:#cbd5e1}
+nav{display:flex;gap:7px;flex-wrap:wrap}.tab,.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:750;cursor:pointer;font-size:.92rem}
+.tab{background:#ffffff1c;color:white}.tab.active{background:white;color:var(--navy)}button:disabled{opacity:.45;cursor:not-allowed}
+main{max-width:1200px;margin:20px auto;padding:0 14px 40px}.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 5px 18px #0f172a0a}
+h1,h2,h3{margin:0 0 12px}h2{font-size:1.2rem}h3{font-size:1rem}.muted{color:var(--muted)}.small{font-size:.83rem}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+label{display:block;font-weight:700;font-size:.88rem;margin:10px 0 5px}input,select,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:9px;font:inherit;background:white;color:var(--ink)}
+textarea{min-height:100px;resize:vertical}.btn{background:var(--blue);color:white}.btn.secondary{background:#e8eef8;color:#183153}.btn.gold{background:var(--gold);color:#302300}.btn.green{background:var(--green)}.btn.red{background:var(--red)}.btn.dark{background:var(--navy)}.btn.outline{background:white;color:var(--blue);border:1px solid #93c5fd}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.scoreboard{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.team-card{border:1px solid var(--line);border-radius:13px;padding:14px;text-align:center;background:#fbfdff;min-width:0}.team-card.first{border:2px solid var(--gold);background:#fffbeb}
+.team-name{font-weight:850;overflow-wrap:anywhere}.score{font-size:2rem;font-weight:950;color:var(--blue);font-variant-numeric:tabular-nums}
+.badge{display:inline-block;padding:4px 9px;border-radius:999px;background:#e2e8f0;color:#334155;font-size:.76rem;font-weight:800}.badge.green{background:#dcfce7;color:#166534}.badge.red{background:#fee2e2;color:#991b1b}.badge.gold{background:#fef3c7;color:#92400e}
+.question-box{background:#10233f;color:white;padding:24px;border-radius:16px;min-height:130px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(1.1rem,2.7vw,1.8rem);font-weight:800;line-height:1.4}
+.timer{font-size:3rem;font-weight:950;text-align:center;color:var(--blue);font-variant-numeric:tabular-nums}.timer.warn{color:var(--red)}
+.buzzer-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.buzzer{width:100%;min-height:145px;border:0;border-radius:18px;background:linear-gradient(145deg,#2563eb,#1e3a8a);color:white;font-size:1.15rem;font-weight:950;box-shadow:0 7px 0 #172554;cursor:pointer}.buzzer:active{transform:translateY(4px);box-shadow:0 3px 0 #172554}.buzzer:disabled{background:#94a3b8;box-shadow:0 5px 0 #64748b}
+.hidden{display:none!important}.notice{padding:12px;border-radius:10px;background:#eff6ff;color:#1e40af;font-size:.9rem}.notice.warn{background:#fff7ed;color:#9a3412}.notice.ok{background:#f0fdf4;color:#166534}
+.list{display:grid;gap:8px}.qrow{padding:10px;border:1px solid var(--line);border-radius:9px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+footer{text-align:center;color:var(--muted);font-size:.8rem;padding:20px}
+@media(max-width:760px){.grid,.grid3{grid-template-columns:1fr}.scoreboard{grid-template-columns:repeat(2,minmax(0,1fr))}.buzzer-grid{grid-template-columns:repeat(2,minmax(0,1fr))}header{align-items:flex-start}.timer{font-size:2.5rem}.panel{padding:14px}}
+@media(min-width:900px){.player-layout{max-width:700px;margin:auto}}
+</style>
+</head>
+<body>
+<header>
+ <div><div class="brand">🏆 LCC <span>ARENA</span></div><div class="sub">Aplikasi Lomba Cerdas Cermat SMA</div></div>
+ <nav>
+  <button class="tab active" data-view="admin">Admin / Juri</button>
+  <button class="tab" data-view="display">Layar Utama</button>
+  <button class="tab" data-view="player">Pemain / Regu</button>
+ </nav>
+</header>
+<main>
+<section id="connection" class="panel">
+ <h2>Pengaturan koneksi pertandingan</h2>
+ <div class="notice warn">Mode lokal berjalan di tab browser yang sama dan tab lain pada perangkat/browser yang sama. Untuk HP peserta yang berbeda, hubungkan Firebase Realtime Database di bawah ini. Firebase adalah layanan online; tidak perlu membuat server sendiri.</div>
+ <div class="grid">
+  <div><label for="roomCode">Kode ruang pertandingan</label><input id="roomCode" value="LCC-SMA-01" maxlength="30"></div>
+  <div><label for="connectionMode">Mode koneksi</label><select id="connectionMode"><option value="local">Lokal (uji coba satu perangkat)</option><option value="firebase">Firebase (antarperangkat)</option></select></div>
+ </div>
+ <div id="firebaseFields" class="hidden">
+  <p class="small muted">Masukkan konfigurasi Firebase Web App dan URL Realtime Database. Buat Realtime Database, lalu atur Rules sesuai kebutuhan dan batasi akses sebelum digunakan dalam lomba resmi.</p>
+  <div class="grid">
+   <div><label>apiKey</label><input id="fbApiKey" placeholder="AIza..."></div>
+   <div><label>authDomain</label><input id="fbAuthDomain" placeholder="proyek.firebaseapp.com"></div>
+   <div><label>databaseURL</label><input id="fbDatabaseURL" placeholder="https://proyek-default-rtdb.asia-southeast1.firebasedatabase.app"></div>
+   <div><label>projectId</label><input id="fbProjectId" placeholder="nama-proyek"></div>
+   <div><label>appId</label><input id="fbAppId" placeholder="1:...:web:..."></div>
+   <div><label>measurementId (opsional)</label><input id="fbMeasurementId" placeholder="G-..."></div>
+  </div>
+ </div>
+ <div class="actions"><button class="btn" id="connectBtn">Terapkan koneksi</button><span id="connectionStatus" class="badge">Belum terhubung</span></div>
+</section>
+
+<section id="adminView">
+ <div class="panel">
+  <h2>Panel Admin / Juri</h2>
+  <div class="grid">
+   <div><label>Nama regu 1</label><input id="team0" value="Regu Merah"></div>
+   <div><label>Nama regu 2</label><input id="team1" value="Regu Biru"></div>
+   <div><label>Nama regu 3</label><input id="team2" value="Regu Hijau"></div>
+   <div><label>Nama regu 4</label><input id="team3" value="Regu Kuning"></div>
+  </div>
+  <div class="actions">
+   <button class="btn" id="saveTeams">Simpan nama regu</button>
+   <button class="btn green" id="startGame">Mulai pertandingan</button>
+   <button class="btn red" id="endGame">Akhiri pertandingan</button>
+   <button class="btn secondary" id="resetGame">Reset pertandingan</button>
+  </div>
+ </div>
+ <div class="panel">
+  <h2>Kontrol soal dan buzzer</h2>
+  <div class="grid">
+   <div><label>Jenis babak</label><select id="roundType"><option>Wajib</option><option>Lemparan</option><option>Rebutan</option></select></div>
+   <div><label>Durasi timer</label><select id="duration"><option value="15">15 detik</option><option value="30" selected>30 detik</option><option value="45">45 detik</option><option value="60">60 detik</option></select></div>
+  </div>
+  <div id="adminQuestion" class="question-box" style="margin-top:12px">Pilih soal dari bank soal atau tulis pertanyaan di bawah.</div>
+  <label for="manualQuestion">Pertanyaan aktif / teks soal</label><textarea id="manualQuestion" placeholder="Ketik atau tempel pertanyaan di sini..."></textarea>
+  <div class="actions">
+   <button class="btn" id="setQuestion">Tampilkan soal</button>
+   <button class="btn gold" id="openBuzz">Buka buzzer</button>
+   <button class="btn red" id="lockBuzz">Kunci buzzer</button>
+   <button class="btn secondary" id="startTimer">Mulai timer</button>
+   <button class="btn secondary" id="stopTimer">Hentikan timer</button>
+   <button class="btn secondary" id="nextQuestion">Soal berikutnya</button>
+  </div>
+  <div class="grid" style="margin-top:14px">
+   <div><div class="muted small">Waktu tersisa</div><div id="adminTimer" class="timer">00:30</div></div>
+   <div><div class="muted small">Status buzzer</div><h2 id="adminBuzzStatus">Terkunci</h2><div id="winnerLabel" class="badge">Belum ada regu yang menekan</div></div>
+  </div>
+ </div>
+ <div class="panel">
+  <h2>Penilaian skor</h2>
+  <p class="muted small">Pilih regu dan masukkan perubahan poin. Gunakan nilai positif untuk jawaban benar dan nilai negatif untuk pengurangan poin.</p>
+  <div class="grid3">
+   <div><label>Regu</label><select id="scoreTeam"></select></div>
+   <div><label>Jenis penilaian</label><select id="scoreReason"><option>Wajib</option><option>Lemparan</option><option>Rebutan</option><option>Bonus</option><option>Pengurangan</option></select></div>
+   <div><label>Perubahan poin</label><input id="scoreValue" type="number" value="10"></div>
+  </div>
+  <div class="actions"><button class="btn green" id="addScore">Simpan skor</button><button class="btn secondary" id="undoScore">Batalkan skor terakhir</button></div>
+  <div id="scoreHistory" class="small muted" style="margin-top:12px">Belum ada riwayat penilaian.</div>
+ </div>
+ <div class="panel">
+  <h2>Bank soal</h2>
+  <div class="grid">
+   <div><label>Filter kategori</label><select id="questionFilter"><option value="Semua">Semua kategori</option><option>Wajib</option><option>Lemparan</option><option>Rebutan</option></select></div>
+   <div><label>Impor berkas JSON / CSV</label><input id="fileImport" type="file" accept=".json,.csv,application/json,text/csv"></div>
+  </div>
+  <label>Tambah soal cepat (format: Kategori | Pertanyaan | Jawaban)</label>
+  <textarea id="questionInput" placeholder="Wajib | Berapakah hasil 5 × 6? | 30&#10;Rebutan | Apa ibu kota Indonesia? | Jakarta"></textarea>
+  <div class="actions"><button class="btn" id="addQuestions">Tambahkan teks soal</button><button class="btn secondary" id="exportQuestions">Ekspor JSON</button><button class="btn secondary" id="clearQuestions">Hapus semua soal</button></div>
+  <div id="questionList" class="list" style="margin-top:12px"></div>
+ </div>
+</section>
+
+<section id="displayView" class="hidden">
+ <div class="panel">
+  <h2 style="text-align:center">🏆 KLASMEN LCC</h2>
+  <div id="displayScores" class="scoreboard"></div>
+ </div>
+ <div class="panel">
+  <div class="grid">
+   <div><span class="badge" id="displayRound">Babak: Wajib</span><h2 style="margin-top:10px">Soal saat ini</h2></div>
+   <div><div id="displayTimer" class="timer">00:30</div><div style="text-align:center" class="muted small">WAKTU TERSISA</div></div>
+  </div>
+  <div id="displayQuestion" class="question-box">Selamat datang di LCC Arena!</div>
+  <div style="text-align:center;margin-top:14px"><span id="displayBuzz" class="badge red">BUZZER TERKUNCI</span><h2 id="displayWinner" style="margin-top:12px">Menunggu regu tercepat...</h2></div>
+ </div>
+</section>
+
+<section id="playerView" class="hidden">
+ <div class="player-layout">
+  <div class="panel">
+   <h2>Halaman Pemain / Regu</h2>
+   <label for="playerTeam">Pilih regu Anda</label><select id="playerTeam"></select>
+   <div class="notice" style="margin-top:12px">Pilih nama regu yang benar. Buzzer hanya aktif setelah juri membukanya.</div>
+   <div id="playerQuestion" class="question-box" style="margin-top:14px">Menunggu soal dari juri...</div>
+   <div style="text-align:center;margin:14px 0"><span id="playerStatus" class="badge red">BUZZER TERKUNCI</span></div>
+   <button id="buzzerButton" class="buzzer" disabled>🔒<br>BUZZER<br><span style="font-size:.8rem">TUNGGU JURI</span></button>
+   <div id="playerFeedback" class="notice" style="margin-top:14px;text-align:center">Buzzer belum dibuka.</div>
+  </div>
+ </div>
+</section>
+</main>
+<footer>LCC Arena • Satu file HTML • Simpan data pertandingan secara lokal di browser</footer>
+
+<script>
+/* =========================================================
+   LCC ARENA - Seluruh logika aplikasi berada dalam file ini.
+   Mode lokal: sinkron antartab melalui BroadcastChannel.
+   Mode Firebase: sinkron ant perangkat melalui Realtime Database.
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const DEFAULT_STATE = () => ({
+ teams:[{name:"Regu Merah",score:0},{name:"Regu Biru",score:0},{name:"Regu Hijau",score:0},{name:"Regu Kuning",score:0}],
+ running:false,ended:false,question:"",round:"Wajib",buzzOpen:false,winner:null,
+ seconds:30,remaining:30,timerRunning:false,history:[],currentQuestionId:null
+});
+let state=DEFAULT_STATE(), questions=[
+ {category:"Wajib",question:"Berapakah hasil dari 12 × 8?",answer:"96"},
+ {category:"Wajib",question:"Apa nama proses tumbuhan membuat makanan?",answer:"Fotosintesis"},
+ {category:"Lemparan",question:"Sebutkan rumus luas lingkaran.",answer:"πr²"},
+ {category:"Lemparan",question:"Planet terbesar dalam tata surya adalah?",answer:"Jupiter"},
+ {category:"Rebutan",question:"Apa ibu kota Provinsi Sumatera Utara?",answer:"Medan"},
+ {category:"Rebutan",question:"Siapa penulis novel Laskar Pelangi?",answer:"Andrea Hirata"}
+];
+let channel=null,db=null,room="LCC-SMA-01",mode="local",timerInterval=null,fbReady=false,ignoreRemote=false;
+const localKey=()=>`lcc_arena_${room}`;
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function announce(msg,type="ok"){ $("connectionStatus").textContent=msg; $("connectionStatus").className="badge "+(type==="bad"?"red":type==="warn"?"gold":"green");}
+function stopClock(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+function render(){
+ $("adminQuestion").textContent=state.question||"Belum ada soal aktif.";
+ $("adminTimer").textContent=fmt(state.remaining);$("adminTimer").classList.toggle("warn",state.remaining<=5);
+ $("adminBuzzStatus").textContent=state.buzzOpen?"TERBUKA":"TERKUNCI";
+ $("winnerLabel").textContent=state.winner===null?"Belum ada regu yang menekan":`${state.teams[state.winner]?.name||"Regu"} paling cepat!`;
+ $("displayRound").textContent="Babak: "+state.round;$("displayTimer").textContent=fmt(state.remaining);$("displayTimer").classList.toggle("warn",state.remaining<=5);
+ $("displayQuestion").textContent=state.question||"Menunggu soal dari juri...";
+ $("displayBuzz").textContent=state.buzzOpen?"BUZZER TERBUKA":"BUZZER TERKUNCI";$("displayBuzz").className="badge "+(state.buzzOpen?"green":"red");
+ $("displayWinner").textContent=state.winner===null?"Menunggu regu tercepat...":`⚡ ${state.teams[state.winner]?.name||"Regu"} mendapatkan kesempatan menjawab!`;
+ $("playerQuestion").textContent=state.question||"Menunggu soal dari juri...";
+ const selected=Number($("playerTeam").value||0),won=state.winner===selected;
+ $("buzzerButton").disabled=!(state.running&&state.buzzOpen&&state.winner===null);
+ $("buzzerButton").innerHTML=won?"⚡<br>ANDA TERCEPAT":state.buzzOpen?"🔔<br>TEKAN BUZZER":"🔒<br>BUZZER<br><span style='font-size:.8rem'>TUNGGU JURI</span>";
+ $("playerStatus").textContent=state.buzzOpen?"BUZZER TERBUKA":"BUZZER TERKUNCI";$("playerStatus").className="badge "+(state.buzzOpen?"green":"red");
+ $("playerFeedback").textContent=won?"Regu Anda berhasil menekan buzzer paling cepat!":state.winner!==null?"Regu lain telah menekan buzzer terlebih dahulu.":state.buzzOpen?"Silakan tekan tombol saat siap menjawab.":"Buzzer belum dibuka oleh juri.";
+ $("displayScores").innerHTML=state.teams.map((t,i)=>`<div class="team-card ${state.winner===i?"first":""}"><div class="team-name">${esc(t.name)}</div><div class="score">${t.score}</div><div class="small muted">POIN</div>${state.winner===i?'<span class="badge gold">TERCEPAT</span>':''}</div>`).join("");
+ $("scoreTeam").innerHTML=state.teams.map((t,i)=>`<option value="${i}">${esc(t.name)}</option>`).join("");
+ $("playerTeam").innerHTML=state.teams.map((t,i)=>`<option value="${i}">${esc(t.name)}</option>`).join("");
+ $("playerTeam").value=String(Math.min(selected,3));
+ $("scoreHistory").innerHTML=state.history.length?state.history.slice(-8).reverse().map(h=>`<div>• ${esc(h.team)}: ${h.points>0?"+":""}${h.points} poin (${esc(h.reason)})</div>`).join(""):"Belum ada riwayat penilaian.";
+}
+function fmt(s){return `00:${String(Math.max(0,s)).padStart(2,"0")}`;}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function persist(){
+ if(ignoreRemote)return;
+ if(mode==="local"){
+  try{localStorage.setItem(localKey(),JSON.stringify({state,questions}));}catch(e){}
+  if(channel)channel.postMessage({room,state,questions});
+ }else if(db){
+  db.ref("lccRooms/"+safeRoom(room)).set({state,questions,updatedAt:Date.now()}).catch(e=>announce("Gagal sinkron: "+e.message,"bad"));
+ }
+}
+function acceptRemote(data){
+ if(!data)return;ignoreRemote=true;
+ if(data.state)state=data.state;if(Array.isArray(data.questions))questions=data.questions;
+ render();renderQuestions();ignoreRemote=false;
+}
+function safeRoom(s){return String(s).replace(/[.#$\[\]\/]/g,"_");}
+function setupLocal(){
+ if(channel)channel.close();channel=new BroadcastChannel("lcc_arena_channel");
+ channel.onmessage=e=>{if(e.data?.room===room)acceptRemote(e.data);};
+ try{const saved=JSON.parse(localStorage.getItem(localKey())||"null");if(saved){if(saved.state)state=saved.state;if(saved.questions)questions=saved.questions;}}catch(e){}
+ announce("Mode lokal aktif","ok");render();renderQuestions();
+}
+function setupFirebase(){
+ const cfg={apiKey:$("fbApiKey").value.trim(),authDomain:$("fbAuthDomain").value.trim(),databaseURL:$("fbDatabaseURL").value.trim(),projectId:$("fbProjectId").value.trim(),appId:$("fbAppId").value.trim()};
+ if(!cfg.apiKey||!cfg.databaseURL||!cfg.projectId||!cfg.appId){announce("Lengkapi apiKey, databaseURL, projectId, appId","bad");return;}
+ const load=()=>{
+  try{
+   if(!firebase.apps.length)firebase.initializeApp(cfg);
+   db=firebase.database();const ref=db.ref("lccRooms/"+safeRoom(room));
+   ref.on("value",snap=>{const val=snap.val();if(val)acceptRemote(val);else persist();});
+   fbReady=true;announce("Firebase terhubung","ok");
+  }catch(e){announce("Firebase gagal: "+e.message,"bad");}
+ };
+ if(window.firebase){load();return;}
+ const script=document.createElement("script");script.src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js";
+ script.onload=()=>{const s=document.createElement("script");s.src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js";s.onload=load;s.onerror=()=>announce("Gagal memuat pustaka Firebase","bad");document.head.appendChild(s);};
+ script.onerror=()=>announce("Tidak dapat memuat Firebase. Periksa internet.","bad");document.head.appendChild(script);
+}
+function applyConnection(){
+ room=$("roomCode").value.trim()||"LCC-SMA-01";mode=$("connectionMode").value;stopClock();
+ if(mode==="local"){db=null;setupLocal();}else{if(channel){channel.close();channel=null;}setupFirebase();}
+}
+function commit(){render();persist();}
+function lockBuzz(){state.buzzOpen=false;commit();}
+function openBuzz(){if(!state.running){alert("Mulai pertandingan terlebih dahulu.");return;}state.winner=null;state.buzzOpen=true;commit();}
+function beginTimer(){
+ stopClock();if(!state.running){alert("Mulai pertandingan terlebih dahulu.");return;}
+ state.timerRunning=true;commit();
+ timerInterval=setInterval(()=>{if(state.remaining>0){state.remaining--;}else{state.timerRunning=false;stopClock();}commit();},1000);
+}
+function setActiveQuestion(text,category){
+ state.question=text;state.round=category||$("roundType").value;state.remaining=Number($("duration").value);state.seconds=state.remaining;state.winner=null;state.buzzOpen=false;stopClock();state.timerRunning=false;commit();
+}
+function addScore(){
+ const i=Number($("scoreTeam").value),points=Number($("scoreValue").value),reason=$("scoreReason").value;
+ if(!Number.isFinite(points)||points===0){alert("Masukkan perubahan poin selain nol.");return;}
+ state.teams[i].score+=points;state.history.push({team:state.teams[i].name,points,reason,time:new Date().toLocaleTimeString("id-ID")});commit();
+}
+function renderQuestions(){
+ const filter=$("questionFilter").value;const list=questions.map((q,i)=>({...q,index:i})).filter(q=>filter==="Semua"||q.category===filter);
+ $("questionList").innerHTML=list.length?list.map(q=>`<div class="qrow"><div><span class="badge">${esc(q.category)}</span><div><b>${esc(q.question)}</b></div><div class="muted small">Jawaban: ${esc(q.answer||"-")}</div></div><button class="btn secondary" data-use="${q.index}">Gunakan</button></div>`).join(""):"<p class='muted'>Belum ada soal pada kategori ini.</p>";
+ $("questionList").querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{const q=questions[Number(b.dataset.use)];$("roundType").value=q.category;$("manualQuestion").value=q.question;setActiveQuestion(q.question,q.category);});
+}
+function parseCSV(text){
+ const lines=text.replace(/^\uFEFF/,"").split(/\r?\n/).filter(x=>x.trim());return lines.slice(1).map(line=>{
+  const a=[];let cur="",quoted=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(quoted&&line[i+1]==='"'){cur+='"';i++;}else quoted=!quoted;}else if(c===","&&!quoted){a.push(cur.trim());cur="";}else cur+=c;}a.push(cur.trim());
+  return {category:a[0]||"Wajib",question:a[1]||"",answer:a[2]||""};
+ }).filter(q=>q.question);
+}
+function importFile(file){
+ const reader=new FileReader();reader.onload=()=>{
+  try{let data;if(file.name.toLowerCase().endsWith(".json")){data=JSON.parse(reader.result);if(!Array.isArray(data))throw Error("JSON harus berupa array soal.");}
+  else data=parseCSV(reader.result);
+  questions=questions.concat(data.map(q=>({category:["Wajib","Lemparan","Rebutan"].includes(q.category)?q.category:"Wajib",question:String(q.question||q.pertanyaan||""),answer:String(q.answer||q.jawaban||"")})).filter(q=>q.question));
+  persist();renderQuestions();alert("Soal berhasil diimpor.");
+  }catch(e){alert("Gagal mengimpor: "+e.message);}
+ };reader.readAsText(file);
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
+ document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));
+ ["admin","display","player"].forEach(v=>$(v+"View").classList.toggle("hidden",v!==b.dataset.view));
+}));
+$("connectionMode").onchange=()=> $("firebaseFields").classList.toggle("hidden",$("connectionMode").value!=="firebase");
+$("connectBtn").onclick=applyConnection;
+$("saveTeams").onclick=()=>{state.teams.forEach((t,i)=>t.name=$("team"+i).value.trim()||`Regu ${i+1}`);commit();};
+$("startGame").onclick=()=>{state.running=true;state.ended=false;state.buzzOpen=false;state.winner=null;commit();};
+$("endGame").onclick=()=>{state.running=false;state.ended=true;state.buzzOpen=false;stopClock();state.timerRunning=false;commit();};
+$("resetGame").onclick=()=>{if(!confirm("Reset skor, status, dan timer pertandingan?"))return;stopClock();state=DEFAULT_STATE();commit();};
+$("setQuestion").onclick=()=>{const q=$("manualQuestion").value.trim();if(!q){alert("Tulis pertanyaan terlebih dahulu.");return;}setActiveQuestion(q,$("roundType").value);};
+$("openBuzz").onclick=openBuzz;$("lockBuzz").onclick=lockBuzz;
+$("startTimer").onclick=beginTimer;$("stopTimer").onclick=()=>{stopClock();state.timerRunning=false;commit();};
+$("nextQuestion").onclick=()=>{lockBuzz();setActiveQuestion("",$("roundType").value);$("manualQuestion").value="";};
+$("addScore").onclick=addScore;
+$("undoScore").onclick=()=>{const h=state.history.pop();if(!h){alert("Belum ada skor untuk dibatalkan.");return;}const t=state.teams.find(x=>x.name===h.team);if(t)t.score-=h.points;commit();};
+$("addQuestions").onclick=()=>{const rows=$("questionInput").value.split(/\r?\n/).filter(x=>x.trim());let count=0;rows.forEach(row=>{const p=row.split("|").map(x=>x.trim());if(p.length>=2){questions.push({category:["Wajib","Lemparan","Rebutan"].includes(p[0])?p[0]:"Wajib",question:p[1],answer:p.slice(2).join("|")});count++;}});$("questionInput").value="";persist();renderQuestions();alert(`${count} soal ditambahkan.`);};
+$("fileImport").onchange=e=>{if(e.target.files[0])importFile(e.target.files[0]);e.target.value="";};
+$("questionFilter").onchange=renderQuestions;
+$("exportQuestions").onclick=()=>{const blob=new Blob([JSON.stringify(questions,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bank-soal-lcc.json";a.click();URL.revokeObjectURL(a.href);};
+$("clearQuestions").onclick=()=>{if(confirm("Hapus seluruh bank soal?")){questions=[];persist();renderQuestions();}};
+$("buzzerButton").onclick=()=>{
+ const i=Number($("playerTeam").value);if(!state.running||!state.buzzOpen||state.winner!==null)return;
+ // Firebase memakai transaksi agar hanya satu regu yang dapat memenangkan buzzer.
+ if(mode==="firebase"&&db){
+  db.ref("lccRooms/"+safeRoom(room)+"/state").transaction(current=>{
+   if(!current||!current.running||!current.buzzOpen||current.winner!==null)return;
+   current.winner=i;current.buzzOpen=false;return current;
+  }).then(result=>{if(result.committed)announce("Buzzer berhasil diklaim!","ok");else announce("Regu lain lebih dahulu menekan buzzer.","warn");})
+    .catch(e=>announce("Gagal mengirim buzzer: "+e.message,"bad"));
+  return;
+ }
+ state.winner=i;state.buzzOpen=false;commit();
+};
+$("playerTeam").onchange=render;
+$("roundType").onchange=()=>{state.round=$("roundType").value;commit();};
+$("duration").onchange=()=>{state.seconds=Number($("duration").value);state.remaining=state.seconds;commit();};
+setupLocal();render();renderQuestions();
+</script>
+</body>
+</html>
